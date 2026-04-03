@@ -1,0 +1,10 @@
+[Unit]
+Description=Run cash deploy every 5 minutes
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+Unit=cash-deploy.service
+
+[Install]
+WantedBy=timers.target

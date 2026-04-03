@@ -1,0 +1,18 @@
+# Template — copy this folder to services/<appname>/
+# Rename, fill in, add a .env from .env.example
+# Commit → auto-deployed within 5 min
+
+services:
+  appname:
+    image: org/image:latest
+    container_name: appname
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:XXXX:YYYY"   # local only; Caddy/tunnel handles external
+    volumes:
+      - appname_data:/data
+    environment:
+      SOME_VAR: ${SOME_VAR}
+
+volumes:
+  appname_data:

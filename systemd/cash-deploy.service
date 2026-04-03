@@ -1,0 +1,11 @@
+[Unit]
+Description=cash-containers GitOps deploy
+After=docker.service network.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=mjb
+ExecStart=/home/mjb/projects/cash-compose/deploy.sh
+StandardOutput=journal
+StandardError=journal
