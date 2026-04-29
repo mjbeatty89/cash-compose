@@ -1,0 +1,32 @@
+# cash-chroma — ChromaDB vector database
+# Used by claude-mem for cross-device semantic search
+# Accessible via Tailscale at cashbox:8000 (internal only)
+
+networks:
+  cash-shared:
+    external: true
+
+services:
+  cash-chroma:
+    image: chromadb/chroma:latest
+    container_name: cash-chroma
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:8000:8000"   # Tailscale-accessible; not exposed externally
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      ANONYMIZED_TELEMETRY: "false"
+      ALLOW_RESET: "false"
+      CHROMA_SERVER_LOG_LEVEL: "WARNING"
+    networks:
+      - cash-shared
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  chroma_data:
