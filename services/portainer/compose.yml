@@ -19,7 +19,7 @@ services:
     networks:
       - cash-shared
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9000/api/status"]
+      test: ["CMD", "/healthcheck"]
       interval: 15s
       timeout: 5s
       retries: 5
