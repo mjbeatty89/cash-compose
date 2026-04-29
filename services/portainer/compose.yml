@@ -11,7 +11,7 @@ services:
     container_name: cash-portainer
     restart: unless-stopped
     ports:
-      - "0.0.0.0:9000:9000"    # HTTP  — Tailscale-accessible
+      - "0.0.0.0:9100:9000"    # HTTP  — Tailscale-accessible (9000 used by rxresume/minio)
       - "0.0.0.0:9443:9443"    # HTTPS — Tailscale-accessible
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
