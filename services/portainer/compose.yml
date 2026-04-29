@@ -1,0 +1,29 @@
+# cash-portainer — Docker management UI
+# Access via Tailscale: http://cashbox:9000 or https://cashbox:9443
+
+networks:
+  cash-shared:
+    external: true
+
+services:
+  cash-portainer:
+    image: portainer/portainer-ce:latest
+    container_name: cash-portainer
+    restart: unless-stopped
+    ports:
+      - "0.0.0.0:9000:9000"    # HTTP  — Tailscale-accessible
+      - "0.0.0.0:9443:9443"    # HTTPS — Tailscale-accessible
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer_data:/data
+    networks:
+      - cash-shared
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9000/api/status"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  portainer_data:
