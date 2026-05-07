@@ -10,6 +10,9 @@ LOG="$REPO_DIR/deploy.log"
 cd "$REPO_DIR"
 git pull origin main 2>&1 | tee -a "$LOG"
 
+# ⚡ Bolt: Parallelize deployments to prevent timing bottlenecks as services grow.
+pids=()
+
 # Bring up each service that has a compose.yml and a .env
 for dir in services/*/; do
     name=$(basename "$dir")
@@ -25,8 +28,20 @@ for dir in services/*/; do
         continue
     fi
 
-    echo "[$(date)] deploying $name..." | tee -a "$LOG"
-    docker compose -f "$compose" --env-file "$env_file" up -d --remove-orphans 2>&1 | tee -a "$LOG"
+    tmp_log="$REPO_DIR/deploy_${name}.log"
+    echo "[$(date)] deploying $name..." > "$tmp_log"
+    docker compose -f "$compose" --env-file "$env_file" up -d --remove-orphans 2>&1 >> "$tmp_log" &
+    pids+=($!)
+done
+
+wait "${pids[@]}"
+
+# Combine temporary logs sequentially to avoid interleaved outputs
+for f in "$REPO_DIR"/deploy_*.log; do
+    if [[ -f "$f" ]]; then
+        cat "$f" | tee -a "$LOG"
+        rm "$f"
+    fi
 done
 
 echo "[$(date)] deploy complete" | tee -a "$LOG"
