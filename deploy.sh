@@ -26,7 +26,11 @@ for dir in services/*/; do
     fi
 
     echo "[$(date)] deploying $name..." | tee -a "$LOG"
-    docker compose -f "$compose" --env-file "$env_file" up -d --remove-orphans 2>&1 | tee -a "$LOG"
+    # ⚡ Bolt Optimization: Run independent container deployments concurrently.
+    # Expected Impact: Reduces total deployment time from O(N) to O(1) bound by the slowest service.
+    docker compose -f "$compose" --env-file "$env_file" up -d --remove-orphans 2>&1 | tee -a "$LOG" &
 done
+
+wait
 
 echo "[$(date)] deploy complete" | tee -a "$LOG"

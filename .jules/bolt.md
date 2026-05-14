@@ -1,0 +1,3 @@
+## 2026-05-14 - Parallel GitOps Deployments
+**Learning:** The GitOps deployment script (`deploy.sh`) iterates sequentially over all service directories to run `docker compose up -d`. As the number of services grows, this `O(N)` loop creates an unnecessarily long deployment window and system load spike, even when `docker compose` does nothing (idempotent). Since each service has its own independent `compose.yml` and isolated state, they can be deployed concurrently.
+**Action:** Always parallelize independent `docker compose` operations in multi-service deployment loops by backgrounding the tasks (`&`) and using `wait`, turning deployment time from `O(N)` to `O(1)` (bound by the slowest service).
