@@ -16,11 +16,9 @@ last_deployed_head=""
 
 if [[ -f "$STATE_FILE" ]]; then
     last_deployed_head=$(<"$STATE_FILE")
-fi
-
-newer_env_file=""
-if [[ -f "$STATE_FILE" ]]; then
     newer_env_file=$(find services/ -type f -name ".env" -newer "$STATE_FILE" -print -quit 2>/dev/null || true)
+else
+    newer_env_file=""
 fi
 
 if [[ -n "$last_deployed_head" && "$current_head" == "$last_deployed_head" && -z "$newer_env_file" ]]; then
@@ -47,8 +45,8 @@ for dir in services/*/; do
         continue
     fi
 
-    tmp_log="$REPO_DIR/deploy_${name}.log"
-    : > "$tmp_log"
+    safe_name=$(printf '%s' "$name" | tr -c 'A-Za-z0-9_.-' '_')
+    tmp_log=$(mktemp "$REPO_DIR/deploy_${safe_name}.XXXXXX.log")
     (
         echo "[$(date)] deploying $name..."
         docker compose -f "$compose" --env-file "$env_file" up -d --remove-orphans
