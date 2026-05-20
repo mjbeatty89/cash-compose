@@ -5,3 +5,7 @@ services/**/.env
 
 # Logs
 deploy.log
+deploy_*.log
+
+# Deploy state
+.last_deploy_commit
