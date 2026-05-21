@@ -9,7 +9,15 @@ LOG="$REPO_DIR/deploy.log"
 STATE_FILE="$REPO_DIR/.last_deploy_commit"
 
 cd "$REPO_DIR"
+OLD_HASH=$(git rev-parse HEAD 2>/dev/null || echo "")
 git pull origin main 2>&1 | tee -a "$LOG"
+NEW_HASH=$(git rev-parse HEAD 2>/dev/null || echo "")
+
+if [ "$OLD_HASH" == "$NEW_HASH" ] && [ -f ".last_deploy" ]; then
+    if [ -z "$(find services -type f -name ".env" -newer .last_deploy -print -quit 2>/dev/null)" ]; then
+        exit 0
+    fi
+fi
 
 current_head=$(git rev-parse HEAD 2>/dev/null || echo "")
 last_deployed_head=""
@@ -79,3 +87,4 @@ fi
 
 echo "$current_head" > "$STATE_FILE"
 echo "[$(date)] deploy complete" | tee -a "$LOG"
+touch .last_deploy
