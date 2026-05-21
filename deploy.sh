@@ -32,7 +32,9 @@ names=()
 tmp_logs=()
 
 for dir in services/*/; do
-    name=$(basename "$dir")
+    # Bolt: use pure bash string manipulation instead of subshells for better performance (avoids process forks)
+    name="${dir%/}"
+    name="${name##*/}"
     compose="$dir/compose.yml"
     env_file="$dir/.env"
 
@@ -45,7 +47,8 @@ for dir in services/*/; do
         continue
     fi
 
-    safe_name=$(printf '%s' "$name" | tr -c 'A-Za-z0-9_.-' '_')
+    # Bolt: pure bash replace for characters not in A-Za-z0-9_.-
+    safe_name="${name//[^A-Za-z0-9_.-]/_}"
     tmp_log=$(mktemp "$REPO_DIR/deploy_${safe_name}.XXXXXX.log")
     (
         echo "[$(date)] deploying $name..."
