@@ -1,0 +1,3 @@
+## 2026-06-11 - Docker shared memory and headless Chrome
+**Learning:** Docker containers default to only 64MB of shared memory (`/dev/shm`). For browser automation and headless Chrome (like `ghcr.io/browserless/chromium`), this is severely insufficient. When the browser exhausts this small memory space, it falls back to using disk storage which causes massive performance bottlenecks (disk thrashing) or outright crashes when rendering complex content (e.g., PDF generation in RxResume).
+**Action:** Always allocate explicitly larger shared memory (e.g., `shm_size: '1gb'`) in `compose.yml` for services running browser automation, headless browsers, or databases with high shared memory requirements to prevent silent fallback to disk processing.

@@ -64,6 +64,11 @@ services:
     image: ghcr.io/browserless/chromium:latest
     container_name: rxresume-chrome
     restart: unless-stopped
+    # ⚡ Bolt: Increase shm_size from default 64MB to 1GB
+    # Headless Chrome requires significant shared memory. 64MB causes it to fall back to
+    # disk for shared memory, which drastically slows down rendering or causes crashes
+    # for complex PDFs. 1GB provides ample memory for fast PDF generation without OOM.
+    shm_size: '1gb'
     environment:
       TIMEOUT: 10000
       CONCURRENT: 10
