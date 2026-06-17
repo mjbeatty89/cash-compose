@@ -32,7 +32,10 @@ names=()
 tmp_logs=()
 
 for dir in services/*/; do
-    name=$(basename "$dir")
+    # Optimization: Use native bash string manipulation instead of external process calls (basename/tr).
+    # Eliminates process fork overhead inside the loop, significantly improving performance.
+    name="${dir%/}"
+    name="${name##*/}"
     compose="$dir/compose.yml"
     env_file="$dir/.env"
 
@@ -45,7 +48,7 @@ for dir in services/*/; do
         continue
     fi
 
-    safe_name=$(printf '%s' "$name" | tr -c 'A-Za-z0-9_.-' '_')
+    safe_name="${name//[^A-Za-z0-9_.-]/_}"
     tmp_log=$(mktemp "$REPO_DIR/deploy_${safe_name}.XXXXXX.log")
     (
         echo "[$(date)] deploying $name..."
