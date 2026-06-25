@@ -15,6 +15,11 @@ services:
     image: postgres:15-alpine
     container_name: rxresume-db
     restart: unless-stopped
+    # ⚡ Bolt: Increase shm_size from default 64MB to 1GB
+    # PostgreSQL relies heavily on shared memory for shared_buffers.
+    # The default 64MB causes it to fall back to disk or limit caching capability,
+    # harming database performance under load.
+    shm_size: '1gb'
     volumes:
       - rxresume_db:/var/lib/postgresql/data
     environment:
