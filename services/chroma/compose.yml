@@ -11,6 +11,11 @@ services:
     image: chromadb/chroma:latest
     container_name: cash-chroma
     restart: unless-stopped
+    # ⚡ Bolt: Increase shm_size from default 64MB to 1GB
+    # Vector databases like ChromaDB load large indexes into shared memory.
+    # Limiting to 64MB causes memory-to-disk fallback, creating significant
+    # latency during semantic search queries.
+    shm_size: '1gb'
     ports:
       - "0.0.0.0:8000:8000"   # Tailscale-accessible; not exposed externally
     volumes:
